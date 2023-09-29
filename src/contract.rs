@@ -7,6 +7,7 @@ use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{State, STATE};
 use crate::execute::try_update_counter;
+use crate::execute::try_reset_counter;
 use crate::query::query_counter;
 
 const CONTRACT_NAME: &str = "crates.io:nitka-smartcontract";
@@ -37,6 +38,7 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::Update {} => try_update_counter(deps),
+        ExecuteMsg::Reset {} => try_reset_counter(deps), 
     }
 }
 
@@ -72,4 +74,6 @@ mod tests {
             vec![attr("counter", ZERO_CODE.to_string())]
         )
     }
+
+
 }

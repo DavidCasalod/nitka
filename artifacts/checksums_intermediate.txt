@@ -1,0 +1,1 @@
+79643aeadaa4c0a83e6310e056a6672ac4399ef688c8ac9302070d488cc6b34e  /target/wasm32-unknown-unknown/release/nitka_smartcontract.wasm

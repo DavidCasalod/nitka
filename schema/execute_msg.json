@@ -13,6 +13,18 @@
         }
       },
       "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "reset"
+      ],
+      "properties": {
+        "reset": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
     }
   ]
 }

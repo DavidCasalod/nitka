@@ -1,6 +1,7 @@
-# CosmWasm Starter Pack
+# NTIKA Smart contract 
 
-This is a template to build smart contracts in Rust to run inside a
+This is a simple smart contract developed using Rust and CosmWasm. The logic of this smart contract is basic: when we execute, the smart contract will increment the counter variable to one.
+
 [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) module on all chains that enable it.
 To understand the framework better, please read the overview in the
 [cosmwasm repo](https://github.com/CosmWasm/cosmwasm/blob/master/README.md),

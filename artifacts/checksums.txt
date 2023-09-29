@@ -1,0 +1,1 @@
+75c4c76db5951270c11be2498557e3bdf2cefae05f7c57562a23723f011ce0b3  nitka_smartcontract.wasm
