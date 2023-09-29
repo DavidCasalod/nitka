@@ -1,107 +1,128 @@
 # NTIKA Smart contract 
 
-This is a simple smart contract developed using Rust and CosmWasm. The logic of this smart contract is basic: when we execute, the smart contract will increment the counter variable to one.
+This is a simple smart contract developed using Rust with CosmWasm. The logic of this smart contract is basic: when we execute, the smart contract will increment the counter variable to one. It also has a  functionality to reset the counter in the contract to 0.
 
-[Cosmos SDK](https://github.com/cosmos/cosmos-sdk) module on all chains that enable it.
-To understand the framework better, please read the overview in the
-[cosmwasm repo](https://github.com/CosmWasm/cosmwasm/blob/master/README.md),
-and dig into the [cosmwasm docs](https://www.cosmwasm.com).
-This assumes you understand the theory and just want to get coding.
+## Functionalities
 
-## Creating a new repo from template
+### 1. Instantiate
+When the smart contract is instantiated, it initializes the counter to zero and sets the contract version and name.
 
-Assuming you have a recent version of rust and cargo (v1.58.1+) installed
-(via [rustup](https://rustup.rs/)),
-then the following should get you a new repo to start a contract:
+### 2. Execute
+This contract can handle two types of messages:
+- **Update:** This will increment the counter by one each time it is called.
+- **Reset:** This will reset the counter to zero.
 
-Install [cargo-generate](https://github.com/ashleygwilliams/cargo-generate) and cargo-run-script.
-Unless you did that before, run this line now:
+### 3. Query
+The contract also has a query functionality that returns the current value of the counter.
 
+## Tests
+### 1. Instantiation Test
+This test asserts that upon instantiation, the counter is set to zero.
+
+### 2. Execute Update Test (`test_execute`)
+This test performs the following:
+   - It instantiates the contract.
+   - Executes the `Update` message once and asserts that the counter is correctly updated to 1.
+   - Executes the `Update` message again and asserts that the counter is incremented to 2.
+
+### 3. Reset Counter Test (`test_reset_counter`)
+This test performs the following:
+   - It assumes that the `Update` message is called several times to increase the counter.
+   - Executes the `Reset` message to reset the counter.
+   - It then verifies that the reset operation has been successful by checking the counter’s value and the response attributes.
+   - Finally, it loads the state and asserts that the counter is indeed reset to 0.
+
+## Running Tests
+
+To run these tests, navigate to the project directory and run:
 ```sh
-cargo install cargo-generate --features vendored-openssl
-cargo install cargo-run-script
+cargo test
+```
+Results: 
+```sh
+~/rust/nitka-smartcontract$ cargo test
+   Compiling nitka-smartcontract v0.1.0 (/home/david.casalod/rust/nitka-smartcontract)
+    Finished test [unoptimized + debuginfo] target(s) in 3.05s
+     Running unittests src/lib.rs (target/debug/deps/nitka_smartcontract-f097190f75288bd3)
+
+running 4 tests
+test contract::tests::test_instantiate ... ok
+test execute::tests::test_reset_counter ... ok
+test execute::tests::test_execute ... ok
+test query::tests::test_query ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests nitka-smartcontract
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 ```
 
-Now, use it to create your new contract.
-Go to the folder in which you want to place it and run:
+## Deployment into Osmosis test-network
 
+To evaluate the smart contract, it was deployed to the Osmosis test network. The contract was compiled, optimized using rust-optimizer, and the resultant wasm binary was stored in the Osmosis Testnet blockchain.
 
-**Latest: 1.0.0-beta6**
+Here are the result of executing the contract and the interaction with the network: 
 
+### Query to check the counter value
 ```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME
-````
+david.casalod@bip-dev-04:~/rust/nitka-smartcontract$  QUERY='{"counter":{}}'osmosisd query wasm contract-state smart $CONTRACT_ADDR "$QUERY" --output json
 
-**Older Version**
-
-Pass version as branch flag:
-
+{"data":{"counter":0}}
+```
+### Increment contract’s count
 ```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch <version> --name PROJECT_NAME
-````
-
-Example:
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 0.16 --name PROJECT_NAME
+david.casalod@bip-dev-04:~/rust/nitka-smartcontract$ TRY_UPDATE='{"update":{}}'
+osmosisd tx wasm execute $CONTRACT_ADDR "$TRY_UPDATE" --from wallet --gas-prices 0.025uosmo --gas auto --gas-adjustment 1.3 -y
+Enter keyring passphrase:
+gas estimate: 147061
+code: 0
+codespace: ""
+data: ""
+events: []
+gas_used: "0"
+gas_wanted: "0"
+height: "0"
+info: ""
+logs: []
+raw_log: '[]'
+timestamp: ""
+tx: null
+txhash: 6C8326335684F27C39D0E4C526BAE744909836B3C47865D671D54D693B3ECDB0
 ```
 
-You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
-containing a simple working contract and build system that you can customize.
-
-## Create a Repo
-
-After generating, you have a initialized local git repo, but no commits, and no remote.
-Go to a server (eg. github) and create a new upstream repo (called `YOUR-GIT-URL` below).
-Then run the following:
-
+### Query again to check the increment in the counter value
 ```sh
-# this is needed to create a valid Cargo.lock file (see below)
-cargo check
-git branch -M main
-git add .
-git commit -m 'Initial Commit'
-git remote add origin YOUR-GIT-URL
-git push -u origin main
+david.casalod@bip-dev-04:~/rust/nitka-smartcontract$ osmosisd query wasm contract-state smart $CONTRACT_ADDR "$QUERY" --output json
+{"data":{"counter":1}}
 ```
 
-## CI Support
+### Reset to 0
+```sh
+david.casalod@bip-dev-04:~/rust/nitka-smartcontract$ TRY_UPDATE='{"reset":{}}'
+osmosisd tx wasm execute $CONTRACT_ADDR "$TRY_UPDATE" --from wallet --gas-prices 0.025uosmo --gas auto --gas-adjustment 1.3 -y  
+Enter keyring passphrase:
+gas estimate: 145631
+code: 0
+codespace: ""
+data: ""
+events: []
+gas_used: "0"
+gas_wanted: "0"
+height: "0"
+info: ""
+logs: []
+raw_log: '[]'
+timestamp: ""
+tx: null
+txhash: 7D91492E870534956EB8B8151CC255F3861295F58CBC2D550ABD25B64B597B39
+david.casalod@bip-dev-04:~/rust/nitka-smartcontract$ osmosisd query wasm contract-state smart $CONTRACT_ADDR "$QUERY" --output json
+{"data":{"counter":0}}
+```
+Through these interactions, we observe the increment in count and its subsequent reset to 0
 
-We have template configurations for both [GitHub Actions](.github/workflows/Basic.yml)
-and [Circle CI](.circleci/config.yml) in the generated project, so you can
-get up and running with CI right away.
 
-One note is that the CI runs all `cargo` commands
-with `--locked` to ensure it uses the exact same versions as you have locally. This also means
-you must have an up-to-date `Cargo.lock` file, which is not auto-generated.
-The first time you set up the project (or after adding any dep), you should ensure the
-`Cargo.lock` file is updated, so the CI will test properly. This can be done simply by
-running `cargo check` or `cargo unit-test`.
-
-## Using your project
-
-Once you have your custom repo, you should check out [Developing](./Developing.md) to explain
-more on how to run tests and develop code. Or go through the
-[online tutorial](https://docs.cosmwasm.com/) to get a better feel
-of how to develop.
-
-[Publishing](./Publishing.md) contains useful information on how to publish your contract
-to the world, once you are ready to deploy it on a running blockchain. And
-[Importing](./Importing.md) contains information about pulling in other contracts or crates
-that have been published.
-
-Please replace this README file with information about your specific project. You can keep
-the `Developing.md` and `Publishing.md` files as useful referenced, but please set some
-proper description in the README.
-
-## Gitpod integration
-
-[Gitpod](https://www.gitpod.io/) container-based development platform will be enabled on your project by default.
-
-Workspace contains:
- - **rust**: for builds
- - [wasmd](https://github.com/CosmWasm/wasmd): for local node setup and client
- - **jq**: shell JSON manipulation tool
-
-Follow [Gitpod Getting Started](https://www.gitpod.io/docs/getting-started) and launch your workspace.
-
+# Conclusion
+The outlined interactions and results demonstrate the basic functionalities of the NTIKA Smart Contract, showing its ability to manipulate the counter value as designed, within the Osmosis test network.
