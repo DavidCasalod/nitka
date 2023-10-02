@@ -1,4 +1,4 @@
-# NTIKA Smart contract 
+# NITKA Smart contract 
 
 This is a simple smart contract developed using Rust with CosmWasm. The logic of this smart contract is basic: when we execute, the smart contract will increment the counter variable to one. It also has a  functionality to reset the counter in the contract to 0.
 
@@ -125,4 +125,4 @@ Through these interactions, we observe the increment in count and its subsequent
 
 
 # Conclusion
-The outlined interactions and results demonstrate the basic functionalities of the NTIKA Smart Contract, showing its ability to manipulate the counter value as designed, within the Osmosis test network.
+The outlined interactions and results demonstrate the basic functionalities of the Nitka Smart Contract, showing its ability to manipulate the counter value as designed, within the Osmosis test network.
